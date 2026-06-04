@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Procurement & Engineering Hub</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    background:#050505;
+    height:100vh;
+    font-family:Arial, sans-serif;
+}
+
+/* Moving Text Container */
+.banner{
+    position:absolute;
+    top:50%;
+    left:0;
+    width:100%;
+    transform:translateY(-50%);
+    overflow:hidden;
+    white-space:nowrap;
+}
+
+/* Moving Text */
+.moving-text{
+    display:inline-block;
+    font-size:70px;
+    font-weight:900;
+    color:#FFD700;
+    text-transform:uppercase;
+    letter-spacing:5px;
+
+    text-shadow:
+        0 0 5px #FFD700,
+        0 0 10px #FFD700,
+        0 0 20px #FFA500,
+        0 0 40px #FFA500;
+
+    animation:moveText 12s linear infinite;
+}
+
+@keyframes moveText{
+    from{
+        transform:translateX(100%);
+    }
+    to{
+        transform:translateX(-100%);
+    }
+}
+
+/* Sparks */
+.spark{
+    position:absolute;
+    width:4px;
+    height:4px;
+    border-radius:50%;
+    background:#FFD700;
+    box-shadow:
+        0 0 10px #FFD700,
+        0 0 20px #FFA500,
+        0 0 30px #FF8C00;
+    pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<div class="banner">
+    <div class="moving-text">
+        COMMUNITY PROCUREMENT & ENGINEERING HUB
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        COMMUNITY PROCUREMENT & ENGINEERING HUB
+    </div>
+</div>
+
+<script>
+
+// Create golden sparks around moving text
+function createSpark(){
+
+    const spark = document.createElement("div");
+    spark.className = "spark";
+
+    const textY = window.innerHeight / 2;
+
+    let x = Math.random() * window.innerWidth;
+    let y = textY + (Math.random() * 100 - 50);
+
+    spark.style.left = x + "px";
+    spark.style.top = y + "px";
+
+    document.body.appendChild(spark);
+
+    const dx = (Math.random() - 0.5) * 10;
+    const dy = (Math.random() - 0.5) * 10;
+
+    let opacity = 1;
+
+    const animate = setInterval(() => {
+
+        x += dx;
+        y += dy;
+
+        spark.style.left = x + "px";
+        spark.style.top = y + "px";
+
+        opacity -= 0.03;
+        spark.style.opacity = opacity;
+
+        if(opacity <= 0){
+            clearInterval(animate);
+            spark.remove();
+        }
+
+    },20);
+}
+
+setInterval(createSpark, 30);
+
+</script>
+
+</body>
+</html>
