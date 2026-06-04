@@ -3,220 +3,311 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Golden Chain Text</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chain Link Text Animation</title>
 
 <style>
 
-*{
+html,body{
     margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-    overflow:hidden;
-    background:#030303;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-/* Moving Banner */
-.banner{
-    position:absolute;
-    width:100%;
-    overflow:hidden;
-    white-space:nowrap;
-}
-
-/* Chain Text */
-.chain-text{
-
-    display:inline-block;
-
-    font-family:"Arial Black", Impact, sans-serif;
-    font-size:130px;
-    font-weight:900;
-    letter-spacing:10px;
-    text-transform:uppercase;
-
-    /* Chain Pattern */
-    background:
-
-    radial-gradient(
-        circle at 50% 50%,
-        #fff9c4 0%,
-        #ffe082 20%,
-        #ffd700 35%,
-        #b8860b 60%,
-        #6b4f00 100%
-    );
-
-    background-size:40px 40px;
-
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    background-clip:text;
-
-    /* Heavy Glow */
-    text-shadow:
-        0 0 5px #ffd700,
-        0 0 10px #ffd700,
-        0 0 20px #ffb300,
-        0 0 40px #ff8c00,
-        0 0 80px #ff8c00;
-
-    animation:moveText 20s linear infinite;
-}
-
-@keyframes moveText{
-
-    from{
-        transform:translateX(100%);
-    }
-
-    to{
-        transform:translateX(-100%);
-    }
-
-}
-
-/* Sparks */
-
-.spark{
-
-    position:absolute;
-
-    width:6px;
-    height:6px;
-
-    border-radius:50%;
-
-    background:#ffd700;
-
-    box-shadow:
-        0 0 10px #ffd700,
-        0 0 20px #ffd700,
-        0 0 40px #ffb300,
-        0 0 60px #ff8c00;
-
-    pointer-events:none;
-}
-
-/* Chain Link Overlay Effect */
-
-.chain-overlay{
-
-    position:absolute;
-    top:0;
-    left:0;
     width:100%;
     height:100%;
-
-    background-image:
-
-    radial-gradient(
-        circle,
-        rgba(255,215,0,.25) 0%,
-        rgba(255,215,0,.08) 30%,
-        transparent 50%
-    );
-
-    background-size:50px 50px;
-
-    opacity:.35;
-
-    pointer-events:none;
+    overflow:hidden;
+    background:#050505;
 }
 
-@media(max-width:768px){
-
-.chain-text{
-    font-size:55px;
-    letter-spacing:4px;
-}
-
+canvas{
+    display:block;
 }
 
 </style>
 
 </head>
-
 <body>
 
-<div class="chain-overlay"></div>
-
-<div class="banner">
-
-<div class="chain-text">
-
-COMMUNITY PROCUREMENT & ENGINEERING HUB
-
-     
-
-COMMUNITY PROCUREMENT & ENGINEERING HUB
-
-</div>
-
-</div>
+<canvas id="canvas"></canvas>
 
 <script>
 
-/* Golden Sparks */
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-function createSpark(){
+let w,h;
 
-    const spark = document.createElement("div");
-    spark.className = "spark";
+function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    buildText();
+}
 
-    let x = Math.random()*window.innerWidth;
+window.addEventListener("resize",resize);
 
-    let y =
-        window.innerHeight/2
-        +
-        (Math.random()*220-110);
+const TEXT =
+"COMMUNITY PROCUREMENT & ENGINEERING HUB";
 
-    spark.style.left = x + "px";
-    spark.style.top = y + "px";
+let links = [];
+let sparks = [];
 
-    document.body.appendChild(spark);
+let offsetX = 0;
 
-    let dx = (Math.random()-0.5)*14;
-    let dy = (Math.random()-0.5)*14;
+/* Create Text Shape */
 
-    let opacity = 1;
-    let scale = 1;
+function buildText(){
 
-    const animate = setInterval(()=>{
+    links = [];
 
-        x += dx;
-        y += dy;
+    const off = document.createElement("canvas");
+    const octx = off.getContext("2d");
 
-        opacity -= 0.025;
-        scale += 0.02;
+    off.width = w;
+    off.height = h;
 
-        spark.style.left = x + "px";
-        spark.style.top = y + "px";
+    const fontSize =
+        Math.min(140, w / 10);
 
-        spark.style.opacity = opacity;
+    octx.fillStyle="white";
+    octx.textAlign="center";
+    octx.textBaseline="middle";
+    octx.font =
+        "900 " + fontSize +
+        "px Arial Black";
 
-        spark.style.transform =
-            `scale(${scale})`;
+    octx.fillText(
+        TEXT,
+        w/2,
+        h/2
+    );
 
-        if(opacity <= 0){
+    const img =
+        octx.getImageData(
+            0,0,w,h
+        ).data;
 
-            clearInterval(animate);
-            spark.remove();
+    const spacing = 10;
+
+    for(
+        let y=0;
+        y<h;
+        y+=spacing
+    ){
+
+        for(
+            let x=0;
+            x<w;
+            x+=spacing
+        ){
+
+            const i =
+                (y*w+x)*4;
+
+            if(img[i+3] > 120){
+
+                links.push({
+
+                    x:x,
+                    y:y,
+
+                    shimmer:
+                    Math.random()
+                    *Math.PI*2
+
+                });
+
+            }
 
         }
 
-    },20);
+    }
 
 }
 
-setInterval(createSpark,20);
+function drawLink(x,y,t){
+
+    const glow =
+        0.7 +
+        0.3 *
+        Math.sin(
+            t
+        );
+
+    ctx.save();
+
+    ctx.translate(x,y);
+    ctx.rotate(
+        Math.sin(t)*0.2
+    );
+
+    const grad =
+        ctx.createLinearGradient(
+            -8,-8,
+            8,8
+        );
+
+    grad.addColorStop(
+        0,
+        "#fff7b0"
+    );
+
+    grad.addColorStop(
+        0.4,
+        "#ffd700"
+    );
+
+    grad.addColorStop(
+        0.7,
+        "#b8860b"
+    );
+
+    grad.addColorStop(
+        1,
+        "#6b4f00"
+    );
+
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 3;
+
+    ctx.shadowColor =
+        "gold";
+
+    ctx.shadowBlur =
+        15*glow;
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        0,0,
+        6,4,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.stroke();
+
+    ctx.restore();
+
+}
+
+function createSpark(){
+
+    const p =
+        links[
+        Math.floor(
+            Math.random()
+            * links.length
+        )];
+
+    if(!p) return;
+
+    sparks.push({
+
+        x:p.x + offsetX,
+        y:p.y,
+
+        vx:
+        (Math.random()-0.5)*4,
+
+        vy:
+        (Math.random()-0.5)*4,
+
+        life:1
+
+    });
+
+}
+
+function drawSpark(s){
+
+    ctx.beginPath();
+
+    ctx.fillStyle=
+        "rgba(255,215,0,"
+        +s.life+")";
+
+    ctx.shadowColor=
+        "gold";
+
+    ctx.shadowBlur=15;
+
+    ctx.arc(
+        s.x,
+        s.y,
+        2,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+}
+
+function animate(){
+
+    requestAnimationFrame(
+        animate
+    );
+
+    ctx.clearRect(
+        0,0,w,h
+    );
+
+    offsetX -= 1.5;
+
+    const minX =
+        -w*1.5;
+
+    if(offsetX < minX){
+
+        offsetX = w;
+
+    }
+
+    const time =
+        performance.now()
+        *0.005;
+
+    for(const p of links){
+
+        drawLink(
+
+            p.x + offsetX,
+
+            p.y,
+
+            time
+            + p.shimmer
+
+        );
+
+    }
+
+    if(
+        Math.random()
+        < 0.7
+    ){
+
+        createSpark();
+
+    }
+
+    sparks =
+    sparks.filter(s=>{
+
+        s.x += s.vx;
+        s.y += s.vy;
+
+        s.life -= 0.02;
+
+        drawSpark(s);
+
+        return s.life > 0;
+
+    });
+
+}
+
+resize();
+animate();
 
 </script>
 
