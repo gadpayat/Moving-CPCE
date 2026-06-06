@@ -304,7 +304,7 @@ ctx.fillRect(
         }
     }
 
-    textX -= 2;
+    textX -= SPEED;
 
     if(
         textX <
@@ -328,7 +328,7 @@ ctx.fillRect(
     canvas.height
 );
 
-animate();
+requestAnimationFrame(animate);
 
 </script>
 
