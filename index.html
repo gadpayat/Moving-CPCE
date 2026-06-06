@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🏗️COMMUNITY PROCUREMENT AND ENGINEERING HUB🚧</title>
+<title>🏗️ COMMUNITY PROCUREMENT AND ENGINEERING HUB 🚧</title>
 
 <style>
 *{
@@ -16,7 +16,7 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#000000;
+    background:#000;
 }
 
 canvas{
@@ -45,10 +45,10 @@ resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
 const TEXT =
-"COMMUNITY PROCUREMENT AND ENGINEERING HUB";
+"🏗️ COMMUNITY PROCUREMENT AND ENGINEERING HUB 🚧";
 
-const FONT_SIZE = 90;      // Increased size
-const SPEED = 3;
+const FONT_SIZE = 90;
+const SPEED = 5;
 
 let textX = canvas.width;
 let textY = canvas.height / 2;
@@ -56,85 +56,141 @@ let textY = canvas.height / 2;
 const sparks = [];
 
 /* ===========================
-   SPARK PARTICLES
+   TRAIN-WHEEL SPARKS
 =========================== */
 
-class Spark {
+class Spark{
 
     constructor(x,y){
 
         this.x = x;
         this.y = y;
 
-        this.vx = (Math.random()-0.5)*4;
-        this.vy = (Math.random()-0.5)*4;
+        // Strong backward spray
+        this.vx = -4 - Math.random()*10;
 
-        this.life = 20 + Math.random()*30;
+        // Random vertical spread
+        this.vy = -3 + Math.random()*6;
+
+        // Gravity
+        this.gravity = 0.18;
+
+        this.life = 25 + Math.random()*20;
         this.maxLife = this.life;
 
-        this.size = 1 + Math.random()*3;
+        this.size = 1 + Math.random()*2.5;
+
+        this.length = 10 + Math.random()*25;
     }
 
     update(){
 
+        this.vy += this.gravity;
+
         this.x += this.vx;
         this.y += this.vy;
-
-        this.vx *= 0.98;
-        this.vy *= 0.98;
 
         this.life--;
     }
 
     draw(){
 
-        const alpha = this.life / this.maxLife;
+        const alpha =
+        this.life / this.maxLife;
+
+        const tailX =
+        this.x - this.vx * this.length / 6;
+
+        const tailY =
+        this.y - this.vy * this.length / 6;
+
+        const gradient =
+        ctx.createLinearGradient(
+            this.x,
+            this.y,
+            tailX,
+            tailY
+        );
+
+        gradient.addColorStop(
+            0,
+            `rgba(255,255,255,${alpha})`
+        );
+
+        gradient.addColorStop(
+            0.3,
+            `rgba(255,230,120,${alpha})`
+        );
+
+        gradient.addColorStop(
+            0.7,
+            `rgba(255,140,0,${alpha})`
+        );
+
+        gradient.addColorStop(
+            1,
+            `rgba(255,60,0,0)`
+        );
+
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = this.size;
+
+        ctx.shadowColor = "#ff9900";
+        ctx.shadowBlur = 12;
+
+        ctx.beginPath();
+        ctx.moveTo(this.x,this.y);
+        ctx.lineTo(tailX,tailY);
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+
+        // White-hot spark core
 
         ctx.beginPath();
 
         ctx.fillStyle =
-        `rgba(255,215,0,${alpha})`;
-
-        ctx.shadowColor = "#FFD700";
-        ctx.shadowBlur = 15;
+        `rgba(255,255,255,${alpha})`;
 
         ctx.arc(
             this.x,
             this.y,
-            this.size,
+            this.size*0.6,
             0,
-            Math.PI * 2
+            Math.PI*2
         );
 
         ctx.fill();
-
-        ctx.shadowBlur = 0;
     }
 }
 
 /* ===========================
-   CREATE SPARKS ALONG TEXT
+   CREATE SPARK SHOWER
 =========================== */
 
 function createSparks(textWidth){
 
-    for(let i=0;i<18;i++){
+    for(let i=0;i<40;i++){
 
         const randomX =
-            textX + Math.random()*textWidth;
+        textX + Math.random()*textWidth;
 
         const randomY =
-            textY - FONT_SIZE/2 +
-            Math.random()*FONT_SIZE;
+        textY -
+        FONT_SIZE/2 +
+        Math.random()*FONT_SIZE;
 
         sparks.push(
-            new Spark(randomX,randomY)
+            new Spark(
+                randomX,
+                randomY
+            )
         );
     }
 }
 
 /* ===========================
-   DRAW TEXT
+   DRAW GOLD TEXT
 =========================== */
 
 function drawText(){
@@ -147,7 +203,7 @@ function drawText(){
     const textWidth =
     ctx.measureText(TEXT).width;
 
-    const goldGradient =
+    const gold =
     ctx.createLinearGradient(
         textX,
         0,
@@ -155,44 +211,17 @@ function drawText(){
         0
     );
 
-    goldGradient.addColorStop(
-        0,
-        "#7A5600"
-    );
+    gold.addColorStop(0,"#7a5600");
+    gold.addColorStop(0.2,"#cfa000");
+    gold.addColorStop(0.4,"#ffd700");
+    gold.addColorStop(0.5,"#fff5b8");
+    gold.addColorStop(0.6,"#ffd700");
+    gold.addColorStop(0.8,"#cfa000");
+    gold.addColorStop(1,"#7a5600");
 
-    goldGradient.addColorStop(
-        0.2,
-        "#CFA000"
-    );
+    ctx.fillStyle = gold;
 
-    goldGradient.addColorStop(
-        0.4,
-        "#FFD700"
-    );
-
-    goldGradient.addColorStop(
-        0.5,
-        "#FFF5B8"
-    );
-
-    goldGradient.addColorStop(
-        0.6,
-        "#FFD700"
-    );
-
-    goldGradient.addColorStop(
-        0.8,
-        "#CFA000"
-    );
-
-    goldGradient.addColorStop(
-        1,
-        "#7A5600"
-    );
-
-    ctx.fillStyle = goldGradient;
-
-    ctx.shadowColor = "#FFD700";
+    ctx.shadowColor = "#ffd700";
     ctx.shadowBlur = 35;
 
     ctx.fillText(
@@ -207,45 +236,65 @@ function drawText(){
 }
 
 /* ===========================
-   ANIMATION LOOP
+   ANIMATION
 =========================== */
 
 function animate(){
 
-    ctx.clearRect(
+    // Motion blur trail
+    ctx.fillStyle =
+    "rgba(0,0,0,0.20)";
+
+    ctx.fillRect(
         0,
         0,
         canvas.width,
         canvas.height
     );
 
-    const textWidth = drawText();
+    const textWidth =
+    drawText();
 
     createSparks(textWidth);
 
     for(
-        let i = sparks.length - 1;
-        i >= 0;
+        let i=sparks.length-1;
+        i>=0;
         i--
     ){
 
         sparks[i].update();
         sparks[i].draw();
 
-        if(sparks[i].life <= 0){
+        if(
+            sparks[i].life <= 0
+        ){
             sparks.splice(i,1);
         }
     }
 
     textX -= SPEED;
 
-    if(textX < -textWidth - 100){
-
-        textX = canvas.width + 100;
+    if(
+        textX <
+        -textWidth - 200
+    ){
+        textX =
+        canvas.width + 200;
     }
 
-    requestAnimationFrame(animate);
+    requestAnimationFrame(
+        animate
+    );
 }
+
+ctx.fillStyle = "#000";
+ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+);
 
 animate();
 
