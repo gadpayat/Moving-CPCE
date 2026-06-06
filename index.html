@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Community Procurement and Engineering Hub</title>
+<title>COMMUNITY PROCUREMENT AND ENGINEERING HUB</title>
 
 <style>
 *{
@@ -12,239 +12,223 @@
     box-sizing:border-box;
 }
 
-body{
+html,body{
+    width:100%;
+    height:100%;
     overflow:hidden;
-    background:#07111d;
-    font-family:Arial, sans-serif;
+    background:#000000;
 }
 
 canvas{
     display:block;
-}
-
-/* Title overlay */
-.title{
-    position:absolute;
-    top:20px;
     width:100%;
-    text-align:center;
-    color:#cfd8dc;
-    font-size:18px;
-    letter-spacing:3px;
-    z-index:10;
-    text-transform:uppercase;
+    height:100%;
 }
 </style>
 </head>
+
 <body>
 
-<div class="title">Engineering & Procurement Animation</div>
 <canvas id="canvas"></canvas>
 
 <script>
+
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-function resize(){
+function resizeCanvas(){
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
-resize();
-window.addEventListener("resize", resize);
 
-// ----------------------
-// Train Text Object
-// ----------------------
-const train = {
-    x: window.innerWidth + 400,
-    y: window.innerHeight/2,
-    speed: 2.5,
-    text: "COMMUNITY PROCUREMENT AND ENGINEERING HUB"
-};
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-// ----------------------
-// Sparks
-// ----------------------
-let sparks = [];
+const TEXT =
+"COMMUNITY PROCUREMENT AND ENGINEERING HUB";
 
-class Spark{
+const FONT_SIZE = 90;      // Increased size
+const SPEED = 3;
+
+let textX = canvas.width;
+let textY = canvas.height / 2;
+
+const sparks = [];
+
+/* ===========================
+   SPARK PARTICLES
+=========================== */
+
+class Spark {
+
     constructor(x,y){
-        this.x=x;
-        this.y=y;
-        this.vx=(Math.random()*4)-2;
-        this.vy=(Math.random()*3)-1.5;
-        this.life=40+Math.random()*30;
-        this.size=Math.random()*4+1;
+
+        this.x = x;
+        this.y = y;
+
+        this.vx = (Math.random()-0.5)*4;
+        this.vy = (Math.random()-0.5)*4;
+
+        this.life = 20 + Math.random()*30;
+        this.maxLife = this.life;
+
+        this.size = 1 + Math.random()*3;
     }
 
     update(){
+
         this.x += this.vx;
         this.y += this.vy;
+
+        this.vx *= 0.98;
+        this.vy *= 0.98;
+
         this.life--;
     }
 
     draw(){
+
+        const alpha = this.life / this.maxLife;
+
         ctx.beginPath();
-        ctx.fillStyle=`rgba(255,215,0,${this.life/70})`;
-        ctx.shadowColor="#FFD700";
-        ctx.shadowBlur=12;
-        ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+
+        ctx.fillStyle =
+        `rgba(255,215,0,${alpha})`;
+
+        ctx.shadowColor = "#FFD700";
+        ctx.shadowBlur = 15;
+
+        ctx.arc(
+            this.x,
+            this.y,
+            this.size,
+            0,
+            Math.PI * 2
+        );
+
         ctx.fill();
-        ctx.shadowBlur=0;
+
+        ctx.shadowBlur = 0;
     }
 }
 
-// ----------------------
-// Draw Blueprint Grid
-// ----------------------
-function drawGrid(){
-    ctx.strokeStyle="rgba(0,150,255,0.08)";
-    ctx.lineWidth=1;
+/* ===========================
+   CREATE SPARKS ALONG TEXT
+=========================== */
 
-    for(let x=0;x<canvas.width;x+=50){
-        ctx.beginPath();
-        ctx.moveTo(x,0);
-        ctx.lineTo(x,canvas.height);
-        ctx.stroke();
-    }
+function createSparks(textWidth){
 
-    for(let y=0;y<canvas.height;y+=50){
-        ctx.beginPath();
-        ctx.moveTo(0,y);
-        ctx.lineTo(canvas.width,y);
-        ctx.stroke();
-    }
-}
+    for(let i=0;i<18;i++){
 
-// ----------------------
-// Draw Rails
-// ----------------------
-function drawRails(){
-    const railY = train.y + 80;
+        const randomX =
+            textX + Math.random()*textWidth;
 
-    ctx.strokeStyle="#666";
-    ctx.lineWidth=6;
+        const randomY =
+            textY - FONT_SIZE/2 +
+            Math.random()*FONT_SIZE;
 
-    ctx.beginPath();
-    ctx.moveTo(0, railY);
-    ctx.lineTo(canvas.width, railY);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(0, railY+30);
-    ctx.lineTo(canvas.width, railY+30);
-    ctx.stroke();
-
-    for(let i=0;i<canvas.width;i+=40){
-        ctx.strokeStyle="#8d6e63";
-        ctx.lineWidth=4;
-        ctx.beginPath();
-        ctx.moveTo(i, railY);
-        ctx.lineTo(i, railY+30);
-        ctx.stroke();
-    }
-}
-
-// ----------------------
-// Draw Gear
-// ----------------------
-function drawGear(cx,cy,radius,rotation){
-    ctx.save();
-    ctx.translate(cx,cy);
-    ctx.rotate(rotation);
-
-    ctx.strokeStyle="#7f8c8d";
-    ctx.lineWidth=3;
-
-    for(let i=0;i<12;i++){
-        ctx.rotate(Math.PI/6);
-        ctx.beginPath();
-        ctx.moveTo(radius,0);
-        ctx.lineTo(radius+10,0);
-        ctx.stroke();
-    }
-
-    ctx.beginPath();
-    ctx.arc(0,0,radius,0,Math.PI*2);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.arc(0,0,radius/3,0,Math.PI*2);
-    ctx.stroke();
-
-    ctx.restore();
-}
-
-// ----------------------
-// Draw Gold Text Train
-// ----------------------
-function drawTrainText(){
-
-    ctx.font="bold 54px Arial";
-
-    const gradient = ctx.createLinearGradient(
-        train.x,0,
-        train.x+600,0
-    );
-
-    gradient.addColorStop(0,"#8B6508");
-    gradient.addColorStop(0.25,"#FFD700");
-    gradient.addColorStop(0.5,"#FFF4B0");
-    gradient.addColorStop(0.75,"#FFD700");
-    gradient.addColorStop(1,"#8B6508");
-
-    ctx.fillStyle=gradient;
-
-    ctx.shadowColor="#FFD700";
-    ctx.shadowBlur=25;
-
-    ctx.fillText(train.text,train.x,train.y);
-
-    ctx.shadowBlur=0;
-
-    // Wheels beneath text
-    const width = ctx.measureText(train.text).width;
-
-    for(let i=0;i<width;i+=150){
-        drawGear(train.x+i+40, train.y+55, 18, performance.now()/600);
-    }
-}
-
-// ----------------------
-// Animation
-// ----------------------
-function animate(){
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    drawGrid();
-    drawRails();
-
-    // Moving gears in background
-    drawGear(120,120,40,performance.now()/2000);
-    drawGear(220,180,28,-performance.now()/1600);
-    drawGear(canvas.width-180,150,45,performance.now()/2200);
-    drawGear(canvas.width-100,250,30,-performance.now()/1800);
-
-    train.x -= train.speed;
-
-    const textWidth = ctx.measureText(train.text).width;
-
-    if(train.x < -textWidth - 100){
-        train.x = canvas.width + 200;
-    }
-
-    // Create sparks behind train
-    for(let i=0;i<3;i++){
         sparks.push(
-            new Spark(
-                train.x + textWidth*0.9,
-                train.y - 20 + Math.random()*60
-            )
+            new Spark(randomX,randomY)
         );
     }
+}
 
-    for(let i=sparks.length-1;i>=0;i--){
+/* ===========================
+   DRAW TEXT
+=========================== */
+
+function drawText(){
+
+    ctx.font =
+    `bold ${FONT_SIZE}px Arial`;
+
+    ctx.textBaseline = "middle";
+
+    const textWidth =
+    ctx.measureText(TEXT).width;
+
+    const goldGradient =
+    ctx.createLinearGradient(
+        textX,
+        0,
+        textX + textWidth,
+        0
+    );
+
+    goldGradient.addColorStop(
+        0,
+        "#7A5600"
+    );
+
+    goldGradient.addColorStop(
+        0.2,
+        "#CFA000"
+    );
+
+    goldGradient.addColorStop(
+        0.4,
+        "#FFD700"
+    );
+
+    goldGradient.addColorStop(
+        0.5,
+        "#FFF5B8"
+    );
+
+    goldGradient.addColorStop(
+        0.6,
+        "#FFD700"
+    );
+
+    goldGradient.addColorStop(
+        0.8,
+        "#CFA000"
+    );
+
+    goldGradient.addColorStop(
+        1,
+        "#7A5600"
+    );
+
+    ctx.fillStyle = goldGradient;
+
+    ctx.shadowColor = "#FFD700";
+    ctx.shadowBlur = 35;
+
+    ctx.fillText(
+        TEXT,
+        textX,
+        textY
+    );
+
+    ctx.shadowBlur = 0;
+
+    return textWidth;
+}
+
+/* ===========================
+   ANIMATION LOOP
+=========================== */
+
+function animate(){
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    const textWidth = drawText();
+
+    createSparks(textWidth);
+
+    for(
+        let i = sparks.length - 1;
+        i >= 0;
+        i--
+    ){
+
         sparks[i].update();
         sparks[i].draw();
 
@@ -253,12 +237,18 @@ function animate(){
         }
     }
 
-    drawTrainText();
+    textX -= SPEED;
+
+    if(textX < -textWidth - 100){
+
+        textX = canvas.width + 100;
+    }
 
     requestAnimationFrame(animate);
 }
 
 animate();
+
 </script>
 
 </body>
