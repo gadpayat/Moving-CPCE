@@ -41,22 +41,22 @@ function resizeCanvas(){
 }
 resizeCanvas();
 
-window.addEventListener("resize",resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
 
 const TEXT =
 "🏗️ COMMUNITY PROCUREMENT AND ENGINEERING HUB 🚧";
 
-const FONT_SIZE = 90;
+const FONT_SIZE = 100;
 const SPEED = 5;
 
 let textX = canvas.width;
-let textY = canvas.height/2;
+let textY = canvas.height / 2;
 
 const sparks = [];
 
-/* ==================================
-   GOLD TRAIN-LIKE SPARKS
-================================== */
+/* =====================================
+   GOLD SPARK PARTICLES
+===================================== */
 
 class Spark{
 
@@ -66,17 +66,17 @@ class Spark{
         this.y = y;
 
         // Down-right direction
-        this.vx = 3 + Math.random()*6;
-        this.vy = 1 + Math.random()*4;
+        this.vx = 3 + Math.random() * 6;
+        this.vy = 1 + Math.random() * 4;
 
         this.gravity = 0.15;
 
-        this.life = 35 + Math.random()*20;
+        this.life = 30 + Math.random() * 20;
         this.maxLife = this.life;
 
-        this.size = 1 + Math.random()*2;
+        this.size = 1 + Math.random() * 2;
 
-        this.length = 10 + Math.random()*25;
+        this.length = 10 + Math.random() * 25;
     }
 
     update(){
@@ -95,10 +95,10 @@ class Spark{
         this.life / this.maxLife;
 
         const tailX =
-        this.x - this.vx * this.length/6;
+        this.x - this.vx * this.length / 6;
 
         const tailY =
-        this.y - this.vy * this.length/6;
+        this.y - this.vy * this.length / 6;
 
         const gradient =
         ctx.createLinearGradient(
@@ -114,43 +114,50 @@ class Spark{
         );
 
         gradient.addColorStop(
-            0.2,
-            `rgba(255,248,180,${alpha})`
+            0.25,
+            `rgba(255,245,180,${alpha})`
         );
 
         gradient.addColorStop(
-            0.5,
+            0.6,
             `rgba(255,215,0,${alpha})`
         );
 
         gradient.addColorStop(
             1,
-            `rgba(160,110,0,0)`
+            `rgba(140,100,0,0)`
         );
 
         ctx.strokeStyle = gradient;
         ctx.lineWidth = this.size;
 
         ctx.shadowColor = "#FFD700";
-        ctx.shadowBlur = 15;
+        ctx.shadowBlur = 12;
 
         ctx.beginPath();
+
         ctx.moveTo(this.x,this.y);
-        ctx.lineTo(tailX,tailY);
+
+        ctx.lineTo(
+            tailX,
+            tailY
+        );
+
         ctx.stroke();
 
-        // Bright gold spark core
+        // Spark core
 
         ctx.beginPath();
+
         ctx.fillStyle =
         `rgba(255,255,220,${alpha})`;
 
         ctx.arc(
             this.x,
             this.y,
-            this.size*0.7,
+            this.size * 0.7,
             0,
-            Math.PI*2
+            Math.PI * 2
         );
 
         ctx.fill();
@@ -159,22 +166,24 @@ class Spark{
     }
 }
 
-/* ==================================
-   SPARK CREATION
-================================== */
+/* =====================================
+   CREATE SPARKS
+===================================== */
 
 function createSparks(textWidth){
 
     for(let i=0;i<35;i++){
 
         const randomX =
-        textX + Math.random()*textWidth;
+        textX +
+        Math.random() * textWidth;
 
-        // Bottom edge of text only
+        // Bottom edge only
 
         const randomY =
-        textY + FONT_SIZE*0.35 +
-        Math.random()*4;
+        textY +
+        FONT_SIZE * 0.35 +
+        Math.random() * 4;
 
         sparks.push(
             new Spark(
@@ -185,14 +194,14 @@ function createSparks(textWidth){
     }
 }
 
-/* ==================================
-   DRAW GOLD TEXT
-================================== */
+/* =====================================
+   DRAW SHARP GOLD TEXT
+===================================== */
 
 function drawText(){
 
     ctx.font =
-    `bold ${FONT_SIZE}px Arial`;
+    `900 ${FONT_SIZE}px Arial Black, Arial, sans-serif`;
 
     ctx.textBaseline = "middle";
 
@@ -207,18 +216,39 @@ function drawText(){
         0
     );
 
-    goldGradient.addColorStop(0,"#6a4a00");
-    goldGradient.addColorStop(0.15,"#b8860b");
-    goldGradient.addColorStop(0.35,"#ffd700");
-    goldGradient.addColorStop(0.5,"#fff8c6");
-    goldGradient.addColorStop(0.65,"#ffd700");
-    goldGradient.addColorStop(0.85,"#b8860b");
-    goldGradient.addColorStop(1,"#6a4a00");
+    goldGradient.addColorStop(0,"#5A3B00");
+    goldGradient.addColorStop(0.15,"#B8860B");
+    goldGradient.addColorStop(0.35,"#FFD700");
+    goldGradient.addColorStop(0.50,"#FFF8C6");
+    goldGradient.addColorStop(0.65,"#FFD700");
+    goldGradient.addColorStop(0.85,"#B8860B");
+    goldGradient.addColorStop(1,"#5A3B00");
 
     ctx.fillStyle = goldGradient;
 
-    ctx.shadowColor = "#FFD700";
-    ctx.shadowBlur = 35;
+    // Dark metallic outline
+
+    ctx.strokeStyle = "#3A2500";
+    ctx.lineWidth = 5;
+
+    ctx.strokeText(
+        TEXT,
+        textX,
+        textY
+    );
+
+    // Bright highlight outline
+
+    ctx.strokeStyle = "#FFF8C6";
+    ctx.lineWidth = 1.5;
+
+    ctx.strokeText(
+        TEXT,
+        textX,
+        textY
+    );
+
+    // Gold fill
 
     ctx.fillText(
         TEXT,
@@ -226,18 +256,16 @@ function drawText(){
         textY
     );
 
-    ctx.shadowBlur = 0;
-
     return textWidth;
 }
 
-/* ==================================
+/* =====================================
    ANIMATION LOOP
-================================== */
+===================================== */
 
 function animate(){
 
-    // Motion blur background
+    // Motion blur trail
 
     ctx.fillStyle =
     "rgba(0,0,0,0.20)";
@@ -276,6 +304,7 @@ function animate(){
         textX <
         -textWidth - 200
     ){
+
         textX =
         canvas.width + 200;
     }
